@@ -9,6 +9,14 @@ import wget
 import os
 import sys
 
+def printBar(percent):
+    total = 50
+    first = total * percent / 100
+    second = total - first
+    sys.stdout.write('\r  [' + '-'*first + ' '*second + '] %d%%' %percent)
+    sys.stdout.flush()
+
+
 def getComicList():
     parser = html_parser.html_parser()
     f = urllib2.urlopen('http://m.blogtruyen.com/danhsach/')
@@ -29,17 +37,16 @@ def downloadComic(name, chapter):
         print '  [+] Chapter %d' %c
         
         # make folder chapxxx
-        folder = '%s/chap_%03d' %(name, c)
+        folder = '%s/%03d' %(name, c)
         if not os.path.exists(folder):
             os.makedirs(folder)
         
         for i in range(0, len(node)):
             link = node[i].attrs[0][1]
-            filename = '%s/%d.jpg' %(folder, i)
-            if os.path.exists(filename):
-                wget.download(link, out=filename, bar=None)
+            filename = '%s/' %(folder)
+            wget.download(link, out=filename, bar=None)
             percent = (i + 1) * 100 / len(node)
-            sys.stdout.write('\r  [' + '-'*percent + ' '*(100- percent) + '] %d%%' %percent)
+	    printBar(percent)
         print ''
 
 if __name__ == '__main__':

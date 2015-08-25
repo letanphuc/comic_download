@@ -13,7 +13,7 @@ def printBar(percent):
     total = 50
     first = total * percent / 100
     second = total - first
-    sys.stdout.write('\r  [' + '-'*first + ' '*second + '] %d%%' %percent)
+    sys.stdout.write('\r  [' + '-' * first + ' ' * second + '] %d%%' % percent)
     sys.stdout.flush()
 
 
@@ -29,21 +29,22 @@ def getComicList():
 def downloadComic(name, chapter):   
     for c in chapter:
         parser = html_parser.html_parser()
-        f = urllib2.urlopen('http://m.blogtruyen.com/truyen/%s/chap-%d' %(name, c))
-        str = f.read().decode('ascii', 'ignore')
+        str = urllib2.urlopen('http://m.blogtruyen.com/truyen/%s/chap-%d' % (name, c)).read()
         parser.feed(str)
-        node = parser.find(['tag:html', 'tag:body', 'class:wrapper', 'class:noidungchap', 'tag:img'])
+        parser.fix()
         
-        print '  [+] Chapter %d' %c
+        node = parser.find(['tag:html', 'tag:body', 'class:wrapper', 'id:ads', 'class:noidungchap', 'tag:img'])
+        
+        print '  [+] Chapter %d' % c
         
         # make folder chapxxx
-        folder = '%s/%03d' %(name, c)
+        folder = '%s/%03d' % (name, c)
         if not os.path.exists(folder):
             os.makedirs(folder)
         
         for i in range(0, len(node)):
             link = node[i].attrs[0][1]
-            filename = '%s/' %(folder)
+            filename = '%s/' % (folder)
             wget.download(link, out=filename, bar=None)
             percent = (i + 1) * 100 / len(node)
 	    printBar(percent)
